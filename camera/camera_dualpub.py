@@ -3,11 +3,8 @@ from rclpy.node import Node
 
 from std_msgs.msg import UInt8MultiArray
 
-import numpy as np
-import cupy as cp
 import gi
 import time
-import gc
 import array
 
 gi.require_version("Gst", "1.0")
@@ -16,9 +13,7 @@ gi.require_version("GstApp", "1.0")
 from gi.repository import Gst,GstApp, GLib
 
 shape = [360,640,3]
-#shape = [540,960,3]
 resolution = shape[0]*shape[1]*shape[2]
-dev0 = cp.cuda.Device(0)
 
 def NewSample(sample):
 
@@ -30,14 +25,13 @@ def NewSample(sample):
     if not success:
         raise RuntimeError("Could not map buffer data!")
 
-    #numpy_frame = np.ndarray(shape=(height, width, 3), dtype=np.uint8, buffer=map_info.data)
-    numpy_frame = array.array('B')
-    numpy_frame.frombytes(map_info.data)
+    _frame = array.array('B')
+    _frame.frombytes(map_info.data)
 
     # Clean up the buffer mapping
     buffer.unmap(map_info)
 
-    return(numpy_frame)
+    return(_frame)
 
 class CameraPublisher(Node):
 
@@ -51,9 +45,6 @@ class CameraPublisher(Node):
 
 
     def timer_callback(self):
-        
-        # msg = UInt8MultiArray()
-        # msg.data = []
 
         start = time.time()
         sample0 = self.sink0.try_pull_sample(Gst.SECOND)
@@ -70,16 +61,12 @@ class CameraPublisher(Node):
             cu0 = NewSample(sample0)
             cu1 = NewSample(sample1)
 
-            # with dev0:
-            #     cup0 = cp.reshape(cu0,(resolution))
-            #     cup1 = cp.reshape(cu1,(resolution))
-
             msg = UInt8MultiArray(data = (cu0 + cu1))
 
         self.publisher_.publish(msg)
         ouga = len(msg.data)
         self.get_logger().info(f'sink: I have a Sample {ouga}: "%s" ... "%s" ... "%s"' % (msg.data[0:3], msg.data[resolution-1:resolution],msg.data[resolution-4:resolution-1]))
-        print("block 5 --- %s seconds ---" % (time.time() - start))
+        print("Time --- %s seconds ---" % (time.time() - start))
 
 
 def main(args=None):

@@ -40,5 +40,8 @@ The display rate is around 28 fps in the best possible case.
 posting is used to send images (.jpg) to a remote server.
 The sending rate is around one frame per second.
 
+async is also used for the very same purpose.
+It is however supposed to use an asynchronous method, even though it does not seem to work properly
+
 display is used to launch a simple Python code
 It will allow the user to see cameras' stream localy with 60f ps.

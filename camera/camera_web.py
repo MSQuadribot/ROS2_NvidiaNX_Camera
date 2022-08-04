@@ -1,9 +1,7 @@
 import rclpy
 from rclpy.node import Node
 
-import numpy as np
 import os
-import pycurl
 import time
 import array
 import requests
@@ -32,12 +30,7 @@ class CameraWebposting(Node):
             self.get_logger().info('Subscribing Cam: Unsuccessful')
         else :
             self.get_logger().info('Subscribing Cam: Successful')
-            # self.img = np.array(msg.data)
-            # if self.img!=[]:
-            #     img0 = np.reshape(np.array(self.img[0:resolution]), (shape[0], shape[1], shape[2]))
-            #     img1 = np.reshape(np.array(self.img[resolution:]), (shape[0], shape[1], shape[2]))
-            #     data = Img.fromarray(np.hstack((img1,img0)))
-            #     data.save('/home/qb/Desktop/dev_ws/src/camera/camera/Image.png')
+
             if msg.data != []:
                 data = Img.frombytes("RGB", (640,720),msg.data.tobytes())
                 data.save('/home/qb/Desktop/dev_ws/src/camera/camera/Image.jpg')
@@ -45,21 +38,6 @@ class CameraWebposting(Node):
                 print('Error while processing')
 
             if os.path.isfile('/home/qb/Desktop/dev_ws/src/camera/camera/Image.jpg'):
-                # c = pycurl.Curl()
-
-                # c.setopt(c.URL,'https://scargo.fr')
-
-                # c.setopt(c.POST,1)
-
-                # c.setopt(pycurl.WRITEFUNCTION, lambda x: None)
-
-                # c.setopt(c.HTTPPOST, [('Image',(c.FORM_FILE, '/home/qb/Desktop/dev_ws/src/camera/camera/Image.jpg'))])
-
-                # c.perform()
-
-                # print('Response : %d' % c.getinfo(c.RESPONSE_CODE))
-
-                # c.close()
 
                 res = requests.post('https://scargo.fr',files = {'Image': open('/home/qb/Desktop/dev_ws/src/camera/camera/Image.jpg','rb')})
 
@@ -80,8 +58,6 @@ def main(args=None):
 
     Camera_webposting = CameraWebposting()
 
-    #while True:
-    
     rclpy.spin(Camera_webposting)
 
     # Destroy the node explicitly
