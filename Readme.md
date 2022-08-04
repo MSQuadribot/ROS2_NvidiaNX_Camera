@@ -30,12 +30,15 @@ $ ros2 run camera {$processname}
 
 There are currently five available process :
 
-talker0 and talker1 are used to launch the publishers
+publisher is used to launch the publisher, thus sending frames from both cameras.
 They will sent frames from the cameras to the subscribers
 
-listener0 and listener1 are used to launch the subscribers
-They will receive frames sent by the publishers
+result is used to launch a subscribers
+They will receive frames sent by the publishers and display them with OpenCV.
+The display rate is around 28 fps in the best possible case.
+
+posting is used to send images (.jpg) to a remote server.
+The sending rate is around one frame per second.
 
 display is used to launch a simple Python code
-It will allow the user to see cameras' stream 
-it currently only work localy
+It will allow the user to see cameras' stream localy with 60f ps.
