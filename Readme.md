@@ -4,25 +4,25 @@ This package's goal is to use the two camera IMX219 provided with the nvidia NX 
 
 ### How to build the package :
 
-First, open a new terminal and go to the following directory : /Desktop/dev_ws
-There you will be able to build all the packages that are in the src subdirectory
+First, open a new terminal and go to the following directory : {/Desktop/dev_ws}.
+There you will be able to build all the packages that are in the src subdirectory.
 
 $ colcon build
 
-This process can take some times (on my machine it could take up to 15s to run)
-Remember that if the built was already completed, there is no need to run it again
-But, be also aware that you have to rebuild the package each time you make a modification
+This process can take some times (on my machine it could take up to 15s to run).
+Remember that if the built was already completed, there is no need to run it again.
+But, be also aware that you have to rebuild the package each time you make a modification.
 
 ### How to run the package :
 
-For that, you will need to open a new terminal and go to the following directory : /Desktop/dev_ws
-If you just built the package, the terminal will need to be different as this can cause issues otherwise
+For that, you will need to open a new terminal and go to the following directory : {/Desktop/dev_ws}.
+If you just built the package, the terminal will need to be different as this can cause issues otherwise.
 
-in order to launch a process for this package you will need to source your workspace
+in order to launch a process for this package you will need to source your workspace.
 
 $ . install/setup.bash
 
-Once done, you can process with using this wonderful package
+Once done, you can process with using this wonderful package.
 
 $ ros2 run camera {$processname}
 
@@ -41,7 +41,19 @@ posting is used to send images (.jpg) to a remote server.
 The sending rate is around one frame per second.
 
 async is also used for the very same purpose.
-It is however supposed to use an asynchronous method, even though it does not seem to work properly
+It is however supposed to use an asynchronous method, even though it does not seem to work properly.
 
-display is used to launch a simple Python code
+display is used to launch a simple Python code.
 It will allow the user to see cameras' stream localy with 60f ps.
+
+### What are the topics provided by this packages
+
+There is a central topic for this package : camera_data, which is provided by the camera publisher.
+This topic is then subscribed by listener, result and posting. It is composed of a bytes array.
+This array contains two frames, taken at the same time, from both camera. One is displayed at the top of the other.
+The main element of this topic is thus a UintMultiArray that encapsulate both images as a bytes array.
+
+The other nodes are consuming this camera_data to produce simple results. They do not return topics.
+
+Finally, display is not using any ROS2 code, it is just a classic python script implemented inside this package.
+This way, it is simpler to use directly and provide a understandable example of what this package provide.
