@@ -6,7 +6,7 @@ import cv2
 
 from std_msgs.msg import UInt8MultiArray
 
-shape = [360,640,3]
+shape = [540,960,3]
 
 resolution = shape[0]*shape[1]*shape[2]
 

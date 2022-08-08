@@ -9,9 +9,6 @@ import requests
 from PIL import Image as Img
 from std_msgs.msg import UInt8MultiArray
 
-shape = [360,640,3]
-resolution = shape[0]*shape[1]*shape[2]
-
 class CameraWebposting(Node):
 
     def __init__(self):
@@ -32,7 +29,7 @@ class CameraWebposting(Node):
             self.get_logger().info('Subscribing Cam: Successful')
 
             if msg.data != []:
-                data = Img.frombytes("RGB", (640,720),msg.data.tobytes())
+                data = Img.frombytes("RGB", (960,1080),msg.data.tobytes())
                 data.save('/home/qb/Desktop/dev_ws/src/camera/camera/Image.jpg')
             else:
                 print('Error while processing')

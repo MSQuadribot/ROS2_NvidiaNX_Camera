@@ -12,7 +12,7 @@ gi.require_version("GstApp", "1.0")
 
 from gi.repository import Gst,GstApp, GLib
 
-shape = [360,640,3]
+shape = [540,960,3]
 resolution = shape[0]*shape[1]*shape[2]
 
 def NewSample(sample):
@@ -38,7 +38,7 @@ class CameraPublisher(Node):
     def __init__(self, sink0, sink1):
         super().__init__('camera_publisher')
         self.publisher_ = self.create_publisher(UInt8MultiArray, 'camera_data', 10)
-        timer_period = 0.035  # seconds
+        timer_period = 0.05  # seconds
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.sink0 = sink0
         self.sink1 = sink1
@@ -60,6 +60,7 @@ class CameraPublisher(Node):
 
             cu0 = NewSample(sample0)
             cu1 = NewSample(sample1)
+            #cu2 = array.array('H',shape)
 
             msg = UInt8MultiArray(data = (cu0 + cu1))
 
@@ -74,13 +75,13 @@ def main(args=None):
 
     Gst.init()
 
-    pipeline0 = Gst.parse_launch("nvarguscamerasrc sensor-id=0 ! video/x-raw(memory:NVMM), width=(int)1280, height=(int)720,format=(string)NV12, framerate=(fraction)30/1 ! nvvidconv ! video/x-raw(memory:NVMM), width=(int)640, height=(int)360,format=(string)NV12 ! nvvidconv ! videoconvert ! video/x-raw, format = RGB ! appsink name=sink0 max-buffers=1 drop=True")
+    pipeline0 = Gst.parse_launch("nvarguscamerasrc sensor-id=0 ! video/x-raw(memory:NVMM), width=(int)1280, height=(int)720,format=(string)NV12, framerate=(fraction)30/1 ! nvvidconv ! video/x-raw(memory:NVMM), width=(int)960, height=(int)540,format=(string)NV12 ! nvvidconv ! videoconvert ! video/x-raw, format = RGB ! appsink name=sink0 max-buffers=1 drop=True")
     
     appsink0 = pipeline0.get_by_name('sink0')
 
     pipeline0.set_state(Gst.State.PLAYING)
 
-    pipeline1 = Gst.parse_launch("nvarguscamerasrc sensor-id=1 ! video/x-raw(memory:NVMM), width=(int)1280, height=(int)720,format=(string)NV12, framerate=(fraction)30/1 ! nvvidconv ! video/x-raw(memory:NVMM), width=(int)640, height=(int)360,format=(string)NV12 ! nvvidconv ! videoconvert ! video/x-raw, format = RGB ! appsink name=sink1 max-buffers=1 drop=True")
+    pipeline1 = Gst.parse_launch("nvarguscamerasrc sensor-id=1 ! video/x-raw(memory:NVMM), width=(int)1280, height=(int)720,format=(string)NV12, framerate=(fraction)30/1 ! nvvidconv ! video/x-raw(memory:NVMM), width=(int)960, height=(int)540,format=(string)NV12 ! nvvidconv ! videoconvert ! video/x-raw, format = RGB ! appsink name=sink1 max-buffers=1 drop=True")
     
     appsink1 = pipeline1.get_by_name('sink1')
 
