@@ -49,6 +49,10 @@ class CameraAsyncWebposting(Node):
 
 
 def main(args=None):
+    '''
+    This function is called when the user launch the executable file.
+    Ros2 will directly start the program here, according to the setup file.
+    '''
 
     # make sure that there is np image in the folder at the start
     if os.path.isfile('/home/qb/Desktop/dev_ws/src/camera/camera/Image.jpg'):

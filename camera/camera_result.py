@@ -13,16 +13,26 @@ resolution = shape[0]*shape[1]*shape[2]
 class CameraResult(Node):
 
     def __init__(self):
+        '''
+        This function is called when the node is created.
+        The node will subscribe to the topic "camera_data".
+        Using the retreived images, the node will display images on the screen.
+        For that purpose, it will use OpenCV.
+        '''
+
         super().__init__('Camera_result')
-        self.subscription = self.create_subscription(
-            UInt8MultiArray,
-            'camera_data',
-            self.listener_callback,
-            10)
+        self.subscription = self.create_subscription(UInt8MultiArray,'camera_data', self.listener_callback,10)
         self.subscription  # prevent unused variable warning
         self.img = None
 
-    def listener_callback(self, msg):                                                                                                                                                                                                                                                                                                                                                   
+    def listener_callback(self, msg): 
+        '''
+        As the node subscribe to the topic, the callback is used.
+        The 1D array received from the topic is converted to a 3D array using numpy.
+        Then, the image is displayed on the screen.
+        It is important to note that the received Image is in RGB format while openCV needs BGR.
+        '''          
+
         if msg.data == []:
             self.get_logger().info('Subscribing: Unsuccessful')
         else :
@@ -31,6 +41,12 @@ class CameraResult(Node):
 
 
 def main(args=None):
+    '''
+    This function is called when the user launch the executable file.
+    Ros2 will directly start the program here, according to the setup file.
+    The loop will use the callback to display the image on the screen.
+    '''
+
     rclpy.init(args=args)
 
     Camera_result = CameraResult()

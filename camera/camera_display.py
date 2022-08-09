@@ -1,10 +1,9 @@
-from time import sleep
-
 import gi
 
 gi.require_version("Gst", "1.0")
 
 from gi.repository import Gst, GLib
+from time import sleep
 
 Gst.init()
 
@@ -14,14 +13,14 @@ pipeline1 = Gst.parse_launch('nvarguscamerasrc sensor-id=1 ! video/x-raw(memory:
 pipeline0.set_state(Gst.State.PLAYING)
 pipeline1.set_state(Gst.State.PLAYING)
 
-### Le Try/except pose certain soucis lorsque l'on utilise Ctrl-C
+# The next statement will display the pipeline on the screen
+# If the user press Ctrl+C, the pipelines will be stopped and the program will exit
 
 try:
    while True:
        sleep(0.1)
 except KeyboardInterrupt:
-    pipeline0.set_state(Gst.State.NULL)
-    pipeline1.set_state(Gst.State.NULL)
+    pass
 
 # Cleaning Pipelines
 pipeline0.set_state(Gst.State.NULL)
