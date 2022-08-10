@@ -63,8 +63,8 @@ def main(args=None):
 
     # make sure that there is np image in the folder at the start
     for i in range(1,11):
-        if os.path.isfile(f'/home/qb/Desktop/dev_ws/src/camera/camera/Image{i}.jpg'):
-            os.remove(f'/home/qb/Desktop/dev_ws/src/camera/camera/Image{i}.jpg')
+        if os.path.isfile(f'/home/qb/Desktop/dev_ws/src/camera/camera/Image.jpg'):
+            os.remove(f'/home/qb/Desktop/dev_ws/src/camera/camera/Image.jpg')
 
     rclpy.init(args=args)
 
