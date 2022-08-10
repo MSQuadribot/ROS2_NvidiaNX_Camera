@@ -33,28 +33,24 @@ class CameraWebposting(Node):
         '''
 
         start = time.time()                                                                                                                                                                                                                                                                                                                                                   
-        if msg.data == [] or self.i > 10:
+        if msg.data == []:
             self.get_logger().info('Subscribing Cam: Unsuccessful')
         else :
             self.get_logger().info('Subscribing Cam: Successful')
 
             if msg.data != []:
                 data = Img.frombytes("RGB", (960,1080),msg.data.tobytes())
-                data.save(f'/home/qb/Desktop/dev_ws/src/camera/camera/Image{self.i}.jpg')
+                data.save(f'/home/qb/Desktop/dev_ws/src/camera/camera/Image.jpg')
             else:
                 print('Error while processing')
 
-            if os.path.isfile(f'/home/qb/Desktop/dev_ws/src/camera/camera/Image{self.i}.jpg'):
+            if os.path.isfile(f'/home/qb/Desktop/dev_ws/src/camera/camera/Image.jpg'):
 
-                res = requests.post(self.URL,files = {'tmp_name':f"Image{self.i}.jpg",'image': open(f'/home/qb/Desktop/dev_ws/src/camera/camera/Image{self.i}.jpg','rb'),'date':datetime.today().strftime('%d-%m-%Y %H:%M')})
+                res = requests.post(self.URL,files = {'tmp_name':f"Image.jpg",'image': open(f'/home/qb/Desktop/dev_ws/src/camera/camera/Image.jpg','rb'),'date':datetime.today().strftime('%d-%m-%Y %H:%M')})
 
                 self.get_logger().info(f'Response Code : {res.status_code}')
                 self.get_logger().info(f'Image counter : {self.i}')
-            
-            if self.i < 10:
-                self.i +=1
-            else:
-                self.i = 1
+                self.i += 1
 
             print("--- %s seconds ---" % (time.time() - start))
 

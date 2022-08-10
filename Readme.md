@@ -57,3 +57,10 @@ The other nodes are consuming this camera_data to produce simple results. They d
 
 Finally, display is not using any ROS2 code, it is just a classic python script implemented inside this package.
 This way, it is simpler to use directly and provide a understandable example of what this package provide.
+
+### How can I see the images online? (Only Quadribot)
+
+In order to see the posted images, one must visit the following website : https://rbox.live/image.php.
+On this page it is possible to aknowledge what images are currently on the server side.
+In order to visualize a specific image in the brower : https://rbox.live/image.php?name={imagename}.
+It is important to note that the image name must be followed by a file extension (mostly .jpg)
