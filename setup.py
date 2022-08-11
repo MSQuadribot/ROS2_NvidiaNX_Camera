@@ -23,9 +23,11 @@ setup(
                 'publisher = camera.camera_dualpub:main',
                 'listener = camera.camera_listener:main',
                 'result = camera.camera_result:main',
-                'display = camera.camera_display.py',
+                'display = camera.camera_display:main',
                 'posting = camera.camera_web:main',
                 'async = camera.camera_async:main',
+                'streamhost = camera.camera_streamhost:main',
+                'streamclient = camera.camera_streamclient:main',
         ],
     },
 )

@@ -31,7 +31,9 @@ $ ros2 run camera {$processname}
 There are currently five available process :
 
 publisher is used to launch the publisher, thus sending frames from both cameras.
-They will sent frames from the cameras to the subscribers
+They will sent frames from the cameras to the various subscribers.
+Frames are publish using classic ROS2 UInt8MultiArray.
+The frames are provided by gstreamer and are converted to msg by the node.
 
 result is used to launch a subscribers
 They will receive frames sent by the publishers and display them with OpenCV.
@@ -45,6 +47,12 @@ It is however supposed to use an asynchronous method, even though it does not se
 
 display is used to launch a simple Python code.
 It will allow the user to see cameras' stream localy with 60f ps.
+
+streamhost and streamclient are both used to perform video streaming using udp protocol.
+Both programs only use simple python scripts with Gstreamer for now. Only works localy.
+streamhost will send video flux using udp protocol with adress 127.0.0.1.
+Port 5000 is used for camera 0 while port 5001 is used for camera 1.
+streamclient then connect to both port using udp and displaying video with gstreamer.
 
 ### What are the topics provided by this packages
 

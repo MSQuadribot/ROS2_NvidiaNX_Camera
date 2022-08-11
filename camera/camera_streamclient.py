@@ -5,13 +5,18 @@ gi.require_version("Gst", "1.0")
 from gi.repository import Gst, GLib
 from time import sleep
 
-def main():
+# Constant values
 
+host = '127.0.0.1'
+port0 = '5000'
+port1 = '5001'
+
+def main():
+    
     Gst.init()
 
-    pipeline0 = Gst.parse_launch('nvarguscamerasrc sensor-id=0 ! video/x-raw(memory:NVMM), width=(int)1280, height=(int)720,format=(string)NV12, framerate=(fraction)60/1 ! nvvidconv ! xvimagesink sync=false')
-    pipeline1 = Gst.parse_launch('nvarguscamerasrc sensor-id=1 ! video/x-raw(memory:NVMM), width=(int)1280, height=(int)720,format=(string)NV12, framerate=(fraction)60/1 ! nvvidconv ! xvimagesink sync=false')
-
+    pipeline0 = Gst.parse_launch(f'udpsrc uri=udp://{host}:{port0} port={port0} ! application/x-rtp,encoding-name=H264,payload=96 ! rtph264depay ! avdec_h264 ! xvimagesink sync=0')
+    pipeline1 = Gst.parse_launch(f'udpsrc uri=udp://{host}:{port1} port={port1} ! application/x-rtp,encoding-name=H264,payload=96 ! rtph264depay ! avdec_h264 ! xvimagesink sync=0')
     pipeline0.set_state(Gst.State.PLAYING)
     pipeline1.set_state(Gst.State.PLAYING)
 
