@@ -7,16 +7,22 @@ from time import sleep
 
 # Constant values
 
-host = '127.0.0.1'
-port0 = '5000'
-port1 = '5001'
+host = '127.0.0.1'  # Note that this is the ip adress of the receiving device
+port0 = '5000'      # Port for the first camera
+port1 = '5001'      # Port for the second camera
 
 def main():
+    '''
+    This program is conceived to retreive the stream sent by the camera_streamhost.py program.
+    The Gstreamer pipeline is created to retreived the video sent via UDP protocol.
+    This program must be launched on the receiving machine.
+    '''
     
     Gst.init()
 
     pipeline0 = Gst.parse_launch(f'udpsrc uri=udp://{host}:{port0} port={port0} ! application/x-rtp,encoding-name=H264,payload=96 ! rtph264depay ! avdec_h264 ! xvimagesink sync=0')
     pipeline1 = Gst.parse_launch(f'udpsrc uri=udp://{host}:{port1} port={port1} ! application/x-rtp,encoding-name=H264,payload=96 ! rtph264depay ! avdec_h264 ! xvimagesink sync=0')
+    
     pipeline0.set_state(Gst.State.PLAYING)
     pipeline1.set_state(Gst.State.PLAYING)
 

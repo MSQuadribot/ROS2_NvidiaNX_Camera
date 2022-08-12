@@ -72,3 +72,14 @@ In order to see the posted images, one must visit the following website : https:
 On this page it is possible to aknowledge what images are currently on the server side.
 In order to visualize a specific image in the brower : https://rbox.live/image.php?name={imagename}.
 It is important to note that the image name must be followed by a file extension (mostly .jpg)
+
+### Are there any current issues ?
+
+First of all it is important to note that there is a deprecated directory.
+Programs in this directory are not supposed to be operational, they were kept to keep track of what has been tested.
+
+There can be troubles when using Gstreamer pipelines.
+Some errors can result in Seg Fault, even though this not to be expected with not deprecated scripts.
+A camera can only be acceded by one pipeline at a time, thus using streahost and publisher at the same time will not work for instance.
+This is why result was created first as it allow the user to stream the camera while performing other tasks.
+However, due to being design for ROS2 Dashing, the stream scripts can be used to stream to devices incompatible with this ROS2 distro. 

@@ -6,20 +6,27 @@ from gi.repository import Gst, GLib
 from time import sleep
 
 # Constant values
-width = '1280'
-height = '720'
-format = 'NV12'
-framerate = '30/1'
-host = '127.0.0.1'
-port0 = '5000'
-port1 = '5001'
+width = '1280'      # Standard width allowed by the camera
+height = '720'      # Standard height allowed by the camera
+format = 'NV12'     # Native format for the computer
+framerate = '30/1'  # Higher framerate will cause blurry noise on the video stream
+host = '127.0.0.1'  # Note that this is the ip adress of the receiving device
+port0 = '5000'      # Port for the first camera
+port1 = '5001'      # Port for the second camera
 
 def main():
+    '''
+    This program is conceived to stream the video from the two cameras.
+    The receiving machine will then launch another program that will received the video.
+    The two cameras are connected to different port, otherwise the video will be mixed.
+    The stream is created with a Gstreamer pipeline.
+    '''
     
     Gst.init()
 
     pipeline0 = Gst.parse_launch(f'nvarguscamerasrc sensor-id=0 ! video/x-raw(memory:NVMM), width={width}, height={height}, format={format}, framerate={framerate} ! nvvidconv ! nvv4l2h264enc insert-sps-pps=1 maxperf-enable=1 ! h264parse ! rtph264pay pt=96 mtu=1316 config-interval=3 ! udpsink host={host} port={port0} sync=0')
     pipeline1 = Gst.parse_launch(f'nvarguscamerasrc sensor-id=1 ! video/x-raw(memory:NVMM), width={width}, height={height}, format={format}, framerate={framerate} ! nvvidconv ! nvv4l2h264enc insert-sps-pps=1 maxperf-enable=1 ! h264parse ! rtph264pay pt=96 mtu=1316 config-interval=3 ! udpsink host={host} port={port1} sync=0')
+    
     pipeline0.set_state(Gst.State.PLAYING)
     pipeline1.set_state(Gst.State.PLAYING)
 
