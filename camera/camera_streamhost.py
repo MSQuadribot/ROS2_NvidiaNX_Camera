@@ -10,7 +10,7 @@ width = '1280'      # Standard width allowed by the camera
 height = '720'      # Standard height allowed by the camera
 format = 'NV12'     # Native format for the computer
 framerate = '30/1'  # Higher framerate will cause blurry noise on the video stream
-host = '127.0.0.1'  # Note that this is the ip adress of the receiving device
+host = '192.168.43.52'  # Note that this is the ip adress of the receiving device ('192.168.43.52' '128.93.18.242')
 port0 = '5000'      # Port for the first camera
 port1 = '5001'      # Port for the second camera
 
