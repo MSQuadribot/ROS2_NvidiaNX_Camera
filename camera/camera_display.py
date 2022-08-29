@@ -6,6 +6,11 @@ from gi.repository import Gst, GLib
 from time import sleep
 
 def main():
+    '''
+    This scripts can be used to easily display the camera's point of view only by using a GStreamer pipeline.
+    It doesn't use any part of ROS2 but it is easy to use and doesn't require the use of multiple Node to work.
+    It should only be used on a Test as it not really useful in collaboration with other scripts of the package.
+    '''
 
     Gst.init()
 
