@@ -40,7 +40,7 @@ class CameraResult(Node):
             self.get_logger().info('Subscribing: Unsuccessful')
         else :
             self.get_logger().info('Subscribing: Successful')
-            self.img = cv2.cvtColor(np.reshape(np.array(msg.data), (2*shape[0], shape[1], shape[2])), cv2.COLOR_BGR2RGB)
+            self.img = cv2.cvtColor(np.reshape(np.array(msg.data), (shape[0], shape[1], shape[2])), cv2.COLOR_BGR2RGB)
 
 
 def main(args=None):
