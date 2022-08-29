@@ -7,7 +7,7 @@ from time import sleep
 
 # Constant values
 
-host = '127.0.0.1'  # Note that this is the ip adress of the receiving device
+host = '192.168.9.1'  # Note that this is the ip adress of the receiving device
 port0 = '5000'      # Port for the first camera
 port1 = '5001'      # Port for the second camera
 
