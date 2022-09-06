@@ -13,39 +13,39 @@ resolution = shape[0]*shape[1]*shape[2]
 
 def obstacle_avoid(depth_map, depth_thresh, output):
 
-	# Mask to segment regions with depth less than threshold
-	mask = cv2.inRange(depth_map,10,depth_thresh)
+    # Mask to segment regions with depth less than threshold
+    mask = cv2.inRange(depth_map,10,depth_thresh)
 
-	# Check if a significantly large obstacle is present and filter out smaller noisy regions
-	if np.sum(mask)/255.0 > 0.01*mask.shape[0]*mask.shape[1]:
+    # Check if a significantly large obstacle is present and filter out smaller noisy regions
+    if np.sum(mask)/255.0 > 0.01*mask.shape[0]*mask.shape[1]:
 
-		# Contour detection 
-		contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-		cnts = sorted(contours, key=cv2.contourArea, reverse=True)
-		
-		# Check if detected contour is significantly large (to avoid multiple tiny regions)
-		if cv2.contourArea(cnts[0]) > 0.01*mask.shape[0]*mask.shape[1]:
+        # Contour detection 
+        contours, _ = cv2.findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        cnts = sorted(contours, key=cv2.contourArea, reverse=True)
 
-			x,y,w,h = cv2.boundingRect(cnts[0])
+        # Check if detected contour is significantly large (to avoid multiple tiny regions)
+        if cv2.contourArea(cnts[0]) > 0.01*mask.shape[0]*mask.shape[1]:
 
-			# finding average depth of region represented by the largest contour 
-			mask2 = np.zeros_like(mask)
-			cv2.drawContours(mask2, cnts, 0, (255), -1)
+            x,y,w,h = cv2.boundingRect(cnts[0])
 
-			# Calculating the average depth of the object closer than the safe distance
-			depth_mean, _ = cv2.meanStdDev(depth_map, mask=mask2)
-			
-			# Display warning text
-			cv2.putText(output, "WARNING !", (x+5,y-40), 1, 2, (0,0,255), 2, 2)
-			cv2.putText(output, "Object at", (x+5,y), 1, 2, (100,10,25), 2, 2)
-			cv2.putText(output, "%.2f cm"%depth_mean, (x+5,y+40), 1, 2, (100,10,25), 2, 2)
-			print(f"x : {x}; y : {y}, w = {w}, h = {h}")
-			print(depth_mean)
+            # finding average depth of region represented by the largest contour 
+            mask2 = np.zeros_like(mask)
+            cv2.drawContours(mask2, cnts, 0, (255), -1)
 
-	else:
-		cv2.putText(output, "SAFE!", (100,100),1,3,(0,255,0),2,3)
+            # Calculating the average depth of the object closer than the safe distance
+            depth_mean, _ = cv2.meanStdDev(depth_map, mask=mask2)
 
-	cv2.imshow('output',output)
+            # Display warning text
+            cv2.putText(output, "WARNING !", (x+5,y-40), 1, 2, (0,0,255), 2, 2)
+            cv2.putText(output, "Object at", (x+5,y), 1, 2, (100,10,25), 2, 2)
+            cv2.putText(output, "%.2f cm"%depth_mean, (x+5,y+40), 1, 2, (100,10,25), 2, 2)
+            print(f"x : {x}; y : {y}, w = {w}, h = {h}")
+            print(depth_mean)
+
+    else:
+        cv2.putText(output, "SAFE!", (100,100),1,3,(0,255,0),2,3)
+
+        cv2.imshow('output',output)
 
 class CameraDepth(Node):
 
