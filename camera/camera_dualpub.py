@@ -6,6 +6,8 @@ from std_msgs.msg import UInt8MultiArray
 import gi
 import time
 import array
+import cv2
+import numpy as np
 
 gi.require_version("Gst", "1.0")
 gi.require_version("GstApp", "1.0")
@@ -54,6 +56,7 @@ class CameraPublisher(Node):
         self.timer = self.create_timer(timer_period, self.timer_callback)
         self.sink0 = sink0
         self.sink1 = sink1
+        self.i = 0
 
 
     def timer_callback(self):
@@ -77,6 +80,18 @@ class CameraPublisher(Node):
 
             cu0 = NewSample(sample0)
             cu1 = NewSample(sample1)
+
+            # ImgL = np.reshape(np.array(cu1),(540,960,3))
+            # ImgR = np.reshape(np.array(cu0),(540,960,3))
+
+            # ImgL = cv2.cvtColor(ImgL, cv2.COLOR_BGR2RGB)
+            # ImgR = cv2.cvtColor(ImgR, cv2.COLOR_BGR2RGB)
+
+            # cv2.imwrite(f"/home/qb/Desktop/PythonWorkspace/StereoVision/Images/Left/imageL{self.i}.png", ImgL)
+            # cv2.imwrite(f"/home/qb/Desktop/PythonWorkspace/StereoVision/Images/Right/imageR{self.i}.png", ImgR)
+
+            # self.i += 1
+            # time.sleep(2)
 
             msg = UInt8MultiArray(data = (cu0 + cu1))
 
