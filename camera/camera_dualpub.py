@@ -99,6 +99,7 @@ class CameraPublisher(Node):
         length = len(msg.data)
         self.get_logger().info(f'sink: I have a Sample of length {length}: "%s" ... "%s" ... "%s"' % (msg.data[0:3], msg.data[resolution-1:resolution],msg.data[resolution-4:resolution-1]))
         print("Time --- %s seconds ---" % (time.time() - start))
+        print('-------------------------------------')
 
 
 def main(args=None):
