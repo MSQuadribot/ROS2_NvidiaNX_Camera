@@ -45,75 +45,6 @@ def obj_detect(item_l,output_l, item_r, M):
     Thus, it should be easy to display the real distance between the object and the camera.
     '''
 
-    obj = False
-
-    list_L = {}
-    area_L = {}
-    list_R = {}
-    area_R = {}
-    list_class = []
-
-    if len(item_l):
-        for e in item_l:
-            x,y,w,h,center, classID = obj_id(e)
-            if classID in list_L:
-                if area_L[classID] < w*h:
-                    list_L[classID] = e
-                    area_L[classID] = w*h
-            else:
-                list_L[classID] = e
-                area_L[classID] = w*h
-                list_class.append(classID)
-
-    if len(item_r):
-        for e in item_r:
-            x,y,w,h,center, classID = obj_id(e)
-            if classID in list_R:
-                if area_R[classID] < w*h:
-                    list_R[classID] = e
-                    area_R[classID] = w*h
-            else:
-                list_R[classID] = e
-                area_R[classID] = w*h
-    
-    print(list_L, list_R)
-
-    for c in list_class:
-        if c in list_R:
-            #if area_L[c] < 1.1*area_R[c] and area_L[c] > area_R[c]:
-            xl,yl,wl,hl,centerl, classIDl = obj_id(list_L[c])
-            xcl, ycl = centerl
-            xr,yr,wr,hr,centerr, classIDr = obj_id(list_R[c])
-            xcr, ycr = centerr
-
-            disparity = xcl - xcr
-            depth = 10 * M/disparity
-
-            start = (xl,yl)
-            end = (xl+wl,yl+hl)
-            color = (255,0,0)
-            thick = 2
-
-            # Display warning text
-            cv2.putText(output_l, "WARNING !", (xl+5,yl-40), 1, 2, (0,0,255), 2, 2)
-            cv2.putText(output_l, "Object at", (xl+5,yl), 1, 2, (100,10,25), 2, 2)
-            cv2.putText(output_l, "%.2f cm"%depth, (xl+5,yl+40), 1, 2, (100,10,25), 2, 2)
-            output_l = cv2.rectangle(output_l,start,end,color,thick)
-
-            print(classIDl, depth)
-
-            obj = True
-
-    # if obj == False :
-    #     cv2.putText(output_l, "SAFE!", (100,100),1,3,(0,255,0),2,3)
-
-def obj_detect_bis(item_l,output_l, item_r, M):
-    '''
-    This fonction will retrieve the position of detected object.
-    Then it will create a binding between the actaul image and the depth map.
-    Thus, it should be easy to display the real distance between the object and the camera.
-    '''
-
     if len(item_l) and len(item_r):
 
         for L in item_l:
@@ -150,61 +81,6 @@ def obj_detect_bis(item_l,output_l, item_r, M):
                     output_l = cv2.rectangle(output_l,start,end,color,thick)
 
                     print(classIDl, depth)
-
-def find_obj(depth_map, depth_thresh, output, disp):
-    '''
-    This function will try to find shapes and object on the disparity map.
-    Then, it will use the coordinates of the object to find its distance using the depth map.
-    Finally, it will display a warning if an object is near the cameras.
-    Even though the object detection is now done by AI, this function was kept as a potential backup.
-    '''
-
-    obj = False
-
-    contours, _ = cv2.findContours(disp, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    cnts = sorted(contours, key=cv2.contourArea, reverse=True)
-    n = len(cnts)
-    i = 0
-
-    while obj == False and i                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                < n:
-
-        x,y,w,h = cv2.boundingRect(cnts[i])
-        start = (x,y)
-        end = (x+w,h+h)
-        color = (255,0,0)
-        thick = 2
-
-        if (x+w)*(y+h) > 0.15*disp.shape[0]*disp.shape[1] and (x+w)*(y+h) < 0.80*disp.shape[0]*disp.shape[1] and h > 0.10*disp.shape[0] and w > 0.10*disp.shape[1]:
-
-            # Calculating the average depth of the object closer than the safe distance
-
-            depth = depth_map[y:y+h,x:x+w]
-            depth_mean = (np.amax(depth) + np.mean(depth))/2
-
-            if depth_mean <= depth_thresh :
-
-                # Display warning text
-                cv2.putText(output, "WARNING !", (x+5,y-40), 1, 2, (0,0,255), 2, 2)
-                cv2.putText(output, "Object at", (x+5,y), 1, 2, (100,10,25), 2, 2)
-                cv2.putText(output, "%.2f cm"%depth_mean, (x+5,y+40), 1, 2, (100,10,25), 2, 2)
-                output = cv2.rectangle(output,start,end,color,thick)
-
-                cv2.putText(disp, "WARNING !", (x+5,y-40), 1, 2, (0,0,255), 2, 2)
-                cv2.putText(disp, "Object at", (x+5,y), 1, 2, (100,10,25), 2, 2)
-                cv2.putText(disp, "%.2f cm"%depth_mean, (x+5,y+40), 1, 2, (100,10,25), 2, 2)
-                disp = cv2.rectangle(disp,start,end,color,thick)
-
-                obj = True
-
-        i = i+1
-
-
-    if obj == False:
-        cv2.putText(output, "SAFE!", (100,100),1,3,(0,255,0),2,3)
-        cv2.putText(disp, "SAFE!", (100,100),1,3,(0,255,0),2,3)
-
-    cv2.imshow('output',output)
-    cv2.imshow('SGBM', disp)
 
 
 class CameraDepth(Node):
@@ -307,7 +183,7 @@ def main(args=None):
             img_r = jetson_utils.cudaToNumpy(img_rgb_r)
             img_r = cv2.cvtColor(img_r, cv2.COLOR_BGR2RGB)
 
-            obj_detect_bis(output_l, img_l, output_r, M)
+            obj_detect(output_l, img_l, output_r, M)
 
             # Display the results
 
