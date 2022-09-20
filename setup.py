@@ -29,6 +29,7 @@ setup(
                 'streamhost = camera.camera_streamhost:main',
                 'streamclient = camera.camera_streamclient:main',
                 'depth = camera.camera_depth:main',
+                'test = camera.camera_depthtest:main',
         ],
     },
 )
