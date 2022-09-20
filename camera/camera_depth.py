@@ -91,7 +91,7 @@ def find_obj(depth_map, depth_thresh, output, disp):
 
         x,y,w,h = cv2.boundingRect(cnts[i])
         start = (x,y)
-        end = (x+w,h+h)
+        end = (x+w,y+h)
         color = (255,0,0)
         thick = 2
 
