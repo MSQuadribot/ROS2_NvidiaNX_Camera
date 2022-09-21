@@ -24,108 +24,63 @@ def remap(x, in_min, in_max, out_min, out_max):
 
 def obj_id(item):
     center = (int(item.Center[0]), int(item.Center[1]))
+    classID = int(item.ClassID)
     h = int(item.Height)
     w = int(item.Width)
     x = int(center[0])-w//2
     y = int(center[1])-h//2
 
-    return(x,y,w,h,center)
+    return(x,y,w,h,center, classID)
 
-def obj_detect(item,depth_map,depth_thresh,output):
+def similar(x,y):
+    if x > 0.75 * y and x < 1.25 * y:
+        return True
+    else :
+        return False
+
+def obj_detect(item_l,output_l, item_r, M):
     '''
     This fonction will retrieve the position of detected object.
     Then it will create a binding between the actaul image and the depth map.
     Thus, it should be easy to display the real distance between the object and the camera.
     '''
 
-    obj = False
+    if len(item_l) and len(item_r):
 
-    if len(item):
-        for e in item:
-            x,y,w,h,center = obj_id(e)
-            xc, yc = center
-            #depth = depth_map[yc:yc+int(0.1*h),xc:xc+int(0.1*w)]
-            depth = depth_map[y:y+h,x:x+w]
+        for L in item_l:
+            xl,yl,wl,hl,centerl, classIDl = obj_id(L)
+            xcl = centerl[0]
 
-            mask = np.zeros_like(depth)
-            mask = remap(depth, np.amin(depth), np.amax(depth), 0, 255).astype(np.uint8)
+            disparity = False
 
-            depth_mean, _ = cv2.meanStdDev(depth, mask=mask)
-            print(depth_mean)
+            for R in item_r:
+                xr,yr,wr,hr,centerr, classIDr = obj_id(R)
+                xcr = centerr[0]
+                
+                if classIDl == classIDr and similar(wl*hl, wr*hr) and (xcl-xcr) > 0 and (10 * M / (xcl-xcr)) < 500:
 
-            start = (x,y)
-            end = (x+w,y+h)
-            color = (255,0,0)
-            thick = 2
+                    if disparity == False:
+                        disparity = xcl - xcr
+                        depth = 10 * M/disparity
+                    
+                    elif disparity != False and (10 * M / (xcl-xcr)) < depth:
+                        disparity = xcl - xcr
+                        depth = 10 * M/disparity
 
-            if depth_mean <= depth_thresh :
+            if disparity != False:
 
-                    # Display warning text
-                    cv2.putText(output, "WARNING !", (x+5,y-40), 1, 2, (0,0,255), 2, 2)
-                    cv2.putText(output, "Object at", (x+5,y), 1, 2, (100,10,25), 2, 2)
-                    cv2.putText(output, "%.2f cm"%depth_mean, (x+5,y+40), 1, 2, (100,10,25), 2, 2)
-                    output = cv2.rectangle(output,start,end,color,thick)
-
-                    obj = True
-
-    if obj == False :
-        cv2.putText(output, "SAFE!", (100,100),1,3,(0,255,0),2,3)
-
-
-def find_obj(depth_map, depth_thresh, output, disp):
-    '''
-    This function will try to find shapes and object on the disparity map.
-    Then, it will use the coordinates of the object to find its distance using the depth map.
-    Finally, it will display a warning if an object is near the cameras.
-    Even though the object detection is now done by AI, this function was kept as a potential backup.
-    '''
-
-    obj = False
-
-    contours, _ = cv2.findContours(disp, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
-    cnts = sorted(contours, key=cv2.contourArea, reverse=True)
-    n = len(cnts)
-    i = 0
-
-    while obj == False and i < n:
-
-        x,y,w,h = cv2.boundingRect(cnts[i])
-        start = (x,y)
-        end = (x+w,y+h)
-        color = (255,0,0)
-        thick = 2
-
-        if (x+w)*(y+h) > 0.15*disp.shape[0]*disp.shape[1] and (x+w)*(y+h) < 0.80*disp.shape[0]*disp.shape[1] and h > 0.10*disp.shape[0] and w > 0.10*disp.shape[1]:
-
-            # Calculating the average depth of the object closer than the safe distance
-
-            depth = depth_map[y:y+h,x:x+w]
-            depth_mean = (np.amax(depth) + np.mean(depth))/2
-
-            if depth_mean <= depth_thresh :
+                start = (xl,yl)
+                end = (xl+wl,yl+hl)
+                color = (255,0,0)
+                thick = 2
 
                 # Display warning text
-                cv2.putText(output, "WARNING !", (x+5,y-40), 1, 2, (0,0,255), 2, 2)
-                cv2.putText(output, "Object at", (x+5,y), 1, 2, (100,10,25), 2, 2)
-                cv2.putText(output, "%.2f cm"%depth_mean, (x+5,y+40), 1, 2, (100,10,25), 2, 2)
-                output = cv2.rectangle(output,start,end,color,thick)
+                cv2.putText(output_l, "WARNING !", (xl+5,yl-40), 1, 2, (0,0,255), 2, 2)
+                cv2.putText(output_l, "Object at", (xl+5,yl), 1, 2, (100,10,25), 2, 2)
+                cv2.putText(output_l, "%.2f cm"%depth, (xl+5,yl+40), 1, 2, (100,10,25), 2, 2)
+                output_l = cv2.rectangle(output_l,start,end,color,thick)
 
-                cv2.putText(disp, "WARNING !", (x+5,y-40), 1, 2, (0,0,255), 2, 2)
-                cv2.putText(disp, "Object at", (x+5,y), 1, 2, (100,10,25), 2, 2)
-                cv2.putText(disp, "%.2f cm"%depth_mean, (x+5,y+40), 1, 2, (100,10,25), 2, 2)
-                disp = cv2.rectangle(disp,start,end,color,thick)
-
-                obj = True
-
-        i = i+1
-
-
-    if obj == False:
-        cv2.putText(output, "SAFE!", (100,100),1,3,(0,255,0),2,3)
-        cv2.putText(disp, "SAFE!", (100,100),1,3,(0,255,0),2,3)
-
-    cv2.imshow('output',output)
-    cv2.imshow('SGBM', disp)
+                print(classIDl, depth)
 
 
 class CameraDepth(Node):
@@ -173,10 +128,10 @@ def main(args=None):
 
     # Define some global geometric parameter (cm)
 
-    M = 25 *0.315
-    min_depth = 30
-    max_depth = 500
-    depth_thresh = 500.0
+    baseline = 25 # cm
+    fov = 160   # °
+    f_pix = (960 * 0.5) / np.tan(fov * 0.5 * np.pi/180) # pixel
+    M = baseline*f_pix
 
     # Reading the mapping values for stereo image rectification
 
@@ -187,38 +142,9 @@ def main(args=None):
     Right_Stereo_Map_y = cv_file.getNode("Right_Stereo_Map_y").mat()
     cv_file.release()
 
-    # Setting parameters for StereoSGBM algorithm
-
-    minDisparity = 0
-    numDisparities = 96
-    blockSize = 7
-    disp12MaxDiff= 1
-    uniquenessRatio = 5
-    speckleWindowSize = 1
-    speckleRange = 20
-
-    sigma = 3
-    lmbda = 10000.0
-
-    #Creating an object of StereoBM algorithm
-
-    stereo = cv2.StereoBM_create(numDisparities=numDisparities, blockSize=blockSize)
-    stereo.setMinDisparity(minDisparity)
-    stereo.setDisp12MaxDiff(disp12MaxDiff)
-    stereo.setUniquenessRatio(uniquenessRatio)
-    stereo.setSpeckleWindowSize(speckleWindowSize)
-    stereo.setSpeckleRange(speckleRange)
-
-    # Create a filter that will be applied to the disparity map
-
-    stereoR = cv2.ximgproc.createRightMatcher(stereo)
-    wls = cv2.ximgproc.createDisparityWLSFilter(stereo)
-    wls.setLambda(lmbda)
-    wls.setSigmaColor(sigma)
-
     # Create a neural network to spot object on the actual image
 
-    net = jetson_inference.detectNet("ssd-mobilenet-v2", threshold=0.35)
+    net = jetson_inference.detectNet("ssd-mobilenet-v2", threshold=0.45)
 
     while True :
         
@@ -238,51 +164,33 @@ def main(args=None):
             Left_nice = cv2.cvtColor(Left_nice_c,cv2.COLOR_BGR2GRAY)
             Right_nice = cv2.cvtColor(Right_nice_c,cv2.COLOR_BGR2GRAY)
 
-            # Create Stereo images and divide the result by 2048 to get a proper disparity map
-
-            disp = stereo.compute(Left_nice,Right_nice)
-            dispR = stereoR.compute(Left_nice,Right_nice)
-            disp = disp/2048
-            dispR = dispR/2048
-
-            disp = wls.filter(disp, Left_nice, disparity_map_right=dispR)
-
-            # Resize the images to prevent non-positive value inside the disparity
-
-            disp = disp[5:535,100:955]
-            Left_nice = Left_nice[5:535,100:955]
-            Left_nice_c = Left_nice_c[5:535,100:955]
-
-            # Remap the actual disparity into an 8-bit image
-
-            amin = np.amin(disp)
-            amax = np.amax(disp)
-            disp = remap(disp,amin,amax,0,255).astype(np.uint8)
-            disp_color = cv2.applyColorMap(disp, cv2.COLORMAP_JET)
-
-            # Create the depth map, taking into account the preceding remaping
-
-            depth_map = M / (disp/255)
-            mask_temp = cv2.inRange(depth_map,0,max_depth)
-            depth_map = cv2.bitwise_and(depth_map,depth_map, mask= mask_temp)
-
             # Perform actual object detection using simple AI from Nvidia Jetson package
             # Some manipulation have to be done to create a binding between cuda and opencv/numpy
 
-            img = jetson_utils.cudaFromNumpy(Left_nice_c, isBGR=True)
-            img_rgb = jetson_utils.cudaAllocMapped(width=img.width, height=img.height, format='rgb8')
-            jetson_utils.cudaConvertColor(img, img_rgb)
-            output = net.Detect(img_rgb)
+            img_l = jetson_utils.cudaFromNumpy(Left_nice_c, isBGR=True)
+            img_rgb_l = jetson_utils.cudaAllocMapped(width=img_l.width, height=img_l.height, format='rgb8')
+            jetson_utils.cudaConvertColor(img_l, img_rgb_l)
+            output_l = net.Detect(img_rgb_l)
 
-            img = jetson_utils.cudaToNumpy(img_rgb)
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+            img_l = jetson_utils.cudaToNumpy(img_rgb_l)
+            img_l = cv2.cvtColor(img_l, cv2.COLOR_BGR2RGB)
 
-            obj_detect(output, depth_map, depth_thresh, img)
+            time.sleep(0.1)
+
+            img_r = jetson_utils.cudaFromNumpy(Right_nice_c, isBGR=True)
+            img_rgb_r = jetson_utils.cudaAllocMapped(width=img_r.width, height=img_r.height, format='rgb8')
+            jetson_utils.cudaConvertColor(img_r, img_rgb_r)
+            output_r = net.Detect(img_rgb_r)
+
+            img_r = jetson_utils.cudaToNumpy(img_rgb_r)
+            img_r = cv2.cvtColor(img_r, cv2.COLOR_BGR2RGB)
+
+            obj_detect(output_l, img_l, output_r, M)
 
             # Display the results
 
-            cv2.imshow('Stereo Vision',img)
-            cv2.imshow('disparity', disp)
+            cv2.imshow('Object Left',img_l)
+            cv2.imshow('Object Right',img_r)
             
             if  cv2.waitKey(1) == ord('q'):
                 break
