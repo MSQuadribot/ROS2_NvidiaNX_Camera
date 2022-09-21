@@ -23,6 +23,10 @@ def remap(x, in_min, in_max, out_min, out_max):
     return (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
 
 def obj_id(item):
+    '''
+    Retreive specific information from the detected item (instance of a specific jetson class).
+    '''
+
     center = (int(item.Center[0]), int(item.Center[1]))
     classID = int(item.ClassID)
     h = int(item.Height)
@@ -33,6 +37,11 @@ def obj_id(item):
     return(x,y,w,h,center, classID)
 
 def similar(x,y):
+    '''
+    Two area are considered similar if they are almost equals (25% error margin in this case).
+    This is important because there can be detection errors between both images.
+    '''
+
     if x > 0.75 * y and x < 1.25 * y:
         return True
     else :
