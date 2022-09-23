@@ -153,7 +153,7 @@ def main(args=None):
 
     # Create a neural network to spot object on the actual image
 
-    net = jetson_inference.detectNet("ssd-mobilenet-v2", threshold=0.45)
+    net = jetson_inference.detectNet("ssd-inception-v2", threshold=0.45)
 
     while True :
         
@@ -173,7 +173,7 @@ def main(args=None):
             Left_nice = cv2.cvtColor(Left_nice_c,cv2.COLOR_BGR2GRAY)
             Right_nice = cv2.cvtColor(Right_nice_c,cv2.COLOR_BGR2GRAY)
 
-            # Perform actual object detection using simple AI from Nvidia Jetson package
+             # Perform actual object detection using simple AI from Nvidia Jetson package
             # Some manipulation have to be done to create a binding between cuda and opencv/numpy
 
             img_l = jetson_utils.cudaFromNumpy(Left_nice_c, isBGR=True)
